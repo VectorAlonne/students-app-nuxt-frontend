@@ -3,7 +3,7 @@
         <div class="card">
             <div class="card-header">
                 <h4>
-                    Add Student
+                    Edit Student
                     <NuxtLink to="/students" class="btn btn-danger float-end">Back</NuxtLink>
                 </h4>
             </div>
@@ -14,7 +14,7 @@
             </div>
             
         <div v-else>
-            <form @submit.prevent="saveStudent">
+            <form @submit.prevent="updateStudent">
                 <div class="mb-3">
                     <label>Name</label>
                     <input type="text" v-model="student.name" class="form-control">
@@ -36,7 +36,7 @@
                     <span class="text-danger" v-if="this.errorList.phone">{{ this.errorList.phone[0] }}</span>
                 </div>
                 <div class="mb-3">
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </form>
         </div>
@@ -47,49 +47,58 @@
 <script>
 import axios from 'axios';
 export default {
-    name: "studentCreate",
+    name: "studentEdit",
     data() {
         return {
-            student: {
-                name: '',
-                course: '',
-                email: '',
-                phone:''
-            },
+            studentId: '',
+            student: {},
             isLoading: false,
             isLoadingTitle: 'Loading',
             errorList: {}
         }
     },
+    mounted() {
+        this.studentId = this.$route.params.id
+        //alert(this.studentId);
+        this.getStudent(this.studentId);
+    },
     methods: {
-        saveStudent() {
+        getStudent(studentId) {
             this.isLoading = true;
-            this.isLoading = "Saving";
+            axios.get(`http://127.0.0.1:8000/api/students/${studentId}/edit`)
+            .then(res => {
+                this.isLoading = false;
+                //console.log(res);
+                this.student = res.data.Student;
+            });
+        },
+
+        updateStudent() {
+            this.isLoading = true;
+            this.isLoading = "Updating";
 
             //alert('Am Here');
 
-            var mythis = this;
-            axios.post(`http://127.0.0.1:8000/api/students`, this.student).then(res => {
-                console.log(res, 'res');
-                alert(res.data.message);    
+            var myThis = this;
 
-                this.student.name = '';
-                this.student.course = '';
-                this.student.email = '';
-                this.student.phone = '';
+            axios.put(`http://127.0.0.1:8000/api/students/${this.studentId}/edit`, this.student).then(res => {
+                console.log(res, 'res');
+                alert(res.data.message);
 
                 this.isLoading = false;
                 this.isLoadingTitle = 'Loading';
+
+                this.errorList = {};
             })
             .catch(function (error) {
                 console.log(error, 'errors')
                 if(error.response) {
                     if(error.response.status == 422) {
-                        mythis.errorList = error.response.data.errors;
+                        myThis.errorList = error.response.data.errors;
                     }
                 }
 
-                mythis.isLoading = false;
+                myThis.isLoading = false;
             });
         }
     },

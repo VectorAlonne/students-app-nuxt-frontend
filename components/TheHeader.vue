@@ -21,6 +21,9 @@ import type { NuxtLink } from '#build/components';
                         <li class="nav-item">
                             <NuxtLink class="nav-link" to="/contact-us">Contact Us</NuxtLink>
                         </li>
+                        <li class="nav-item">
+                            <NuxtLink class="nav-link" to="/students">Students</NuxtLink>
+                        </li>
                     </ul>
                 </div>
             </div>
